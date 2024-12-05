@@ -1,46 +1,47 @@
 """Advent of Code - 04.12.2024"""
 
 import os
-import sys
 import re
+import sys
 from typing import Any
 
 
 def transpose(list_: list[list[Any]]) -> list[list[Any]]:
     """Transpose list of lists (matrix)."""
-    return list(map(list, zip(*list_)))
+    return [list(tuple_) for tuple_ in zip(*list_)]
 
 
-def rotate(list_: list[list[Any]], direction: str = "right") -> list[list[Any]]:
+def rotate(list_: list[list[Any]], direction: str) -> list[list[Any]]:
     """Rotate list of lists to the left/right."""
     if direction == "left":
-        return reversed(transpose(list_))
+        return list(reversed(transpose(list_)))
     if direction == "right":
-        return transpose(reversed(list_))
+        return transpose(list(reversed(list_)))
     raise ValueError("'direction' must be 'left' or 'right'")
 
 
-def shift_matrix(mat: list[list[Any]], shift: str, token: str | int | float = "*"):
-    """
-    Sshift the matrix by 1 in each row to the left/right.
-    """
-    mat_ = []
-    if shift == "left":
-        for i, row in enumerate(mat):
-            mat_.append((len(mat) - i - 1) * [token] + row + i * [token])
-        return mat_
+def shift_matrix(
+    mat: list[list[Any]], shift: str, token: str | int | float = "*"
+) -> list[list[Any]]:
+    """Shift the matrix by 1 in each row to the left/right."""
+    if not shift in ("left", "right"):
+        raise ValueError("'shift' must be 'left' or 'right'")
+
     if shift == "right":
-        for i, row in enumerate(mat):
-            mat_.append(i * [token] + row + (len(mat) - i - 1) * [token])
-        return mat_
-    raise ValueError("'shift' must be 'left' or 'right'")
+        mat = list(reversed(mat))
+
+    mat_ = []
+    for i, row in enumerate(mat):  # Shift columns and add tokens
+        mat_.append((len(mat) - i - 1) * [token] + row + i * [token])
+
+    if shift == "right":
+        return list(reversed(mat_))
+    return mat_
 
 
 def add_matrix_frame(
-    mat: list[list[Any]],
-    framewidth: int,
-    token: str | int | float = "*",
-):
+    mat: list[list[Any]], framewidth: int, token: str | int | float = "*"
+) -> list[list[Any]]:
     """
     Add a frame around a matrix, i.e., a list of lists with the thickness \
         'framewidth' and filled with 'frame_token'.
@@ -48,10 +49,7 @@ def add_matrix_frame(
     hframe = [len(mat[0]) * [token] for _ in range(framewidth)]
     vframe = framewidth * [token]
     mat = hframe + mat + hframe
-    mat_ = []
-    for row in mat:
-        mat_.append(vframe + row + vframe)
-    return mat_
+    return [vframe + row + vframe for row in mat]
 
 
 DAY = 4
@@ -60,17 +58,15 @@ TEST = True
 
 def main() -> int:
     """Main function"""
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    filename = f"2024_12_{DAY:02d}{"_test" if TEST else ""}.txt"
-    filepath = os.path.join(current_dir, "files", filename)
+    filepath = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "files",
+        f"2024_12_{DAY:02d}{"_test" if TEST else ""}.txt",
+    )
 
     # Part 1 ###################################################################
-    data = []
     with open(filepath, "r", encoding="utf-8") as file:
-        for line in file:
-            data.append(list(line)[:-1])
-
-    xmas_str = "XMAS"
+        data = [list(line)[:-1] for line in file]
 
     search_matrices = [
         data,  # horizontal
@@ -79,13 +75,13 @@ def main() -> int:
         transpose(shift_matrix(data, "right")),  # upper right -> lower left
     ]
 
-    xmas_cnt = 0
+    num_xmas_p1 = 0
     for mat in search_matrices:
         for row in mat:
-            xmas_cnt += len(re.findall(xmas_str, "".join(row)))
-            xmas_cnt += len(re.findall(xmas_str, "".join(reversed(row))))
+            num_xmas_p1 += len(re.findall("XMAS", "".join(row)))
+            num_xmas_p1 += len(re.findall("XMAS", "".join(reversed(row))))
 
-    print(f"Num of XMAS part 1: {xmas_cnt}")
+    print(f"Num of XMAS part 1: {num_xmas_p1}")
 
     # Part 2 ###################################################################
     # Add frame
@@ -98,11 +94,14 @@ def main() -> int:
             if char == "A":
                 a_xy.append([x, y])
 
-    # Find X-MAS patterns
-    pattern = [["S", "S"], ["M", "M"]]
-    x_max_cnt = 0
+    # Inspect each "A" and find X-MAS patterns
+    num_xmas_p2 = 0
     for x, y in a_xy:
         rows = framed_mat[y - 1 : y + 2]
+        pattern = [
+            ["S", "S"],
+            ["M", "M"],
+        ]
         for _ in range(4):
             if (
                 rows[0][x - 1] == pattern[0][0]
@@ -110,11 +109,11 @@ def main() -> int:
                 and rows[2][x - 1] == pattern[1][0]
                 and rows[2][x + 1] == pattern[1][1]
             ):
-                x_max_cnt += 1
+                num_xmas_p2 += 1
                 break
             pattern = rotate(pattern, "right")
 
-    print(f"Num of XMAS part 2: {x_max_cnt}")
+    print(f"Num of XMAS part 2: {num_xmas_p2}")
 
     return 0
 

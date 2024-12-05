@@ -1,26 +1,25 @@
 """Advent of Code - 02.12.2024"""
 
 import os
-import sys
 import re
+import sys
 
 DAY = 2
-TEST = True
+TEST = False
 
 
-def get_dists(nums: list):
-    """Get distances"""
-    dists = []
-    for num1, num2 in zip(nums, nums[1:]):
-        dists.append(num2 - num1)
-    return dists
+def diff(nums: list[int | float]) -> list[int | float]:
+    """Get differences between numbers in a list."""
+    return [num2 - num1 for num1, num2 in zip(nums, nums[1:])]
 
 
 def main() -> int:
     """Main function"""
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    filename = f"2024_12_{DAY:02d}{"_test" if TEST else ""}.txt"
-    filepath = os.path.join(current_dir, "files", filename)
+    filepath = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "files",
+        f"2024_12_{DAY:02d}{"_test" if TEST else ""}.txt",
+    )
 
     # Part 1 & 2
     with open(filepath, "r", encoding="utf-8") as file:
@@ -29,16 +28,17 @@ def main() -> int:
         for line in file:
             nums = [int(num) for num in re.findall(r"\d+", line)]
 
-            dists = get_dists(nums)
+            diffs = diff(nums)
 
-            if set(dists).issubset({-3, -2, -1}) or set(dists).issubset({3, 2, 1}):
+            if set(diffs).issubset({-3, -2, -1}) or set(diffs).issubset({3, 2, 1}):
                 num_reports_p1 += 1
             else:
                 for i, _ in enumerate(nums):
+                    # Remove one number and try again
                     nums_copy = nums.copy()
                     nums_copy.pop(i)
-                    dists = get_dists(nums_copy)
-                    if set(dists).issubset({-3, -2, -1}) or set(dists).issubset(
+                    diffs = diff(nums_copy)
+                    if set(diffs).issubset({-3, -2, -1}) or set(diffs).issubset(
                         {3, 2, 1}
                     ):
                         num_reports_p2 += 1

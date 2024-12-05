@@ -1,33 +1,30 @@
 """Advent of Code - 01.12.2024"""
 
 import os
-import sys
 import re
+import sys
 
 DAY = 1
-TEST = True
+TEST = False
 
 
 def main() -> int:
     """Main function"""
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    filename = f"2024_12_{DAY:02d}{"_test" if TEST else ""}.txt"
-    filepath = os.path.join(current_dir, "files", filename)
+    filepath = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "files",
+        f"2024_12_{DAY:02d}{"_test" if TEST else ""}.txt",
+    )
 
     with open(filepath, "r", encoding="utf-8") as file:
 
         # Part 1
-        first, second = [], []
-        for line in file:
-            f, s = [int(num) for num in re.findall(r"\d+", line)]
-            first.append(f)
-            second.append(s)
+        num_tuples = [list(map(int, re.findall(r"\d+", line))) for line in file]
+        first, second = [list(t) for t in zip(*num_tuples)]
         first.sort()
         second.sort()
 
-        tot_dist = 0
-        for f, s in zip(first, second):
-            tot_dist += abs(s - f)
+        tot_dist = sum(abs(s - f) for f, s in zip(first, second))
         print(f"Total distance: {tot_dist}")
 
         # Part 2
