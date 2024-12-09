@@ -1,4 +1,4 @@
-"""Advent of Code - 07.12.2024"""
+"""Advent of Code - 7.12.2024"""
 
 import os
 import sys
