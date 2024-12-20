@@ -1,11 +1,9 @@
-"""Advent of Code - XX.12.2024"""
+"""Advent of Code - 22.12.2024"""
 
 import os
 import sys
 
-sys.setrecursionlimit(10_000)
-
-DAY = 0
+DAY = 22
 TEST = True
 
 

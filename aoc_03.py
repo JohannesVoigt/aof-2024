@@ -13,7 +13,7 @@ def main() -> int:
     filepath = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
         "files",
-        f"2024_12_{DAY:02d}{"_test" if TEST else ""}.txt",
+        f"2024_12_{DAY:02d}{'_test' if TEST else ''}.txt",
     )
 
     with open(filepath, "r", encoding="utf-8") as file:

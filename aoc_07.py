@@ -66,10 +66,11 @@ def decimal_to_base(
 
 def main() -> int:
     """Main function"""
-
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    filename = f"2024_12_{DAY:02d}{"_test" if TEST else ""}.txt"
-    filepath = os.path.join(current_dir, "files", filename)
+    filepath = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "files",
+        f"2024_12_{DAY:02d}{'_test' if TEST else ''}.txt",
+    )
 
     with open(filepath, "r", encoding="utf-8") as file:
         data = [list(map(int, line.replace(":", "").split(" "))) for line in file]
